@@ -255,14 +255,29 @@ async function handleGeneration(ctx) {
       qrBuffer: ctx.session.data.qrBuffer
     };
     const wallpaperBuffer = await generateWallpaperWithRetry(params);
+    
+    // Send document without buttons (Telegram doesn't support inline keyboards on documents)
     await ctx.replyWithDocument(
       { source: wallpaperBuffer, filename: `${params.eventName}_wallpaper.png` },
-      { caption: '✅ Your wallpaper is ready!\nUse /start to create another one.' }
+      { caption: '✅ Your wallpaper is ready!' }
     );
-    ctx.session.state = null;
+    
+    // Send buttons in a separate message
+    await ctx.reply(
+      'What would you like to do next?',
+      Markup.inlineKeyboard([
+        [Markup.button.callback('🔄 Generate Again', 'generate_again')],
+        [Markup.button.callback('🆕 New Wallpaper (/start)', 'new_wallpaper')]
+      ])
+    );
+    
+    // Keep session data for regeneration, only reset state
+    ctx.session.state = 'COMPLETED';
   } catch (error) {
-    console.error('[ERROR] Generation failed:', error);
-    await ctx.reply(`❌ Generation failed: ${error.message}\nTry again with /start`);
+    console.error('[ERROR] Generation failed:', error.message);
+    await ctx.reply(`❌ Generation failed: ${error.message}\n\nPlease try again with /start`);
+    ctx.session.state = null;
+    ctx.session.data = {};
   }
 }
 
@@ -383,6 +398,19 @@ bot.action('qr_url', async (ctx) => {
 bot.action('qr_onetime', async (ctx) => {
   ctx.session.state = 'AWAITING_QR_UPLOAD';
   await ctx.editMessageText('📤 Please upload your QR code image:');
+});
+
+bot.action('generate_again', async (ctx) => {
+  await ctx.answerCbQuery();
+  await ctx.editMessageText('🔄 Regenerating with the same settings...');
+  await handleGeneration(ctx);
+});
+
+bot.action('new_wallpaper', async (ctx) => {
+  await ctx.answerCbQuery();
+  ctx.session.state = null;
+  ctx.session.data = {};
+  await ctx.editMessageText('Starting fresh! Use /start to begin.');
 });
 
 bot.on('text', async (ctx) => {

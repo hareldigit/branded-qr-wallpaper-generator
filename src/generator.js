@@ -35,18 +35,31 @@ LAYOUT (Top to Bottom):
 2. HEADER (Start close to top with minimal padding):
    - Line 1: "${personalName}" in LARGE glowing ${selectedHex} futuristic font
    - Line 2: "${eventName}" in LARGE white/light font (SAME SIZE as Line 1)
+   - IMPORTANT: If text is too long, reduce font size to fit within 85% of screen width
    - Very close spacing between the two lines (almost stacked)
 3. CENTRAL SUBJECT - Use the person from the portrait image EXACTLY AS THEY APPEAR (same clothes, same pose)
+   - CRITICAL: Position the person's HEAD 30-40% down from the top (below where notifications appear)
+   - This ensures their face is visible below the clock and notification area
    - Keep their natural appearance and clothing
    - Add cyberpunk atmosphere AROUND them (not changing them)
    - Illuminate them with ${selectedHex} neon rim-lighting
    - Add a glowing circular halo or frame around their head/shoulders
-4. BACKGROUND - Complex tech environment:
-   - Circuit board traces and digital patterns
-   - Floating data streams and holographic UI elements
+4. BACKGROUND - Complex tech environment (MAKE IT UNIQUE):
+   - Variation seed: ${Math.random().toString(36).substring(7)}
+   - Use DIFFERENT circuit board patterns, data flow directions, and holographic elements each time
+   - Floating data streams and holographic UI elements in varied positions
    - Place the logo image as a holographic projection or glowing emblem in the scene
    - Use volumetric lighting with ${selectedHex} as primary light source
-5. BOTTOM - LARGE QR code with high-contrast neon frame in ${selectedHex}
+   - Add random tech elements: hex grids, wireframes, or glowing particles
+5. BOTTOM - LARGE QR code with FUTURISTIC high-contrast frame:
+   - Create a STUNNING frame design with advanced tech aesthetics:
+     * Multi-layered metallic borders with depth and dimension
+     * Glowing neon edges with ${selectedHex} pulsing effect
+     * Holographic corner accents or geometric corner brackets
+     * Subtle transparency/glass morphism with reflections
+     * Optional: hexagonal tech panels, circuit traces, or energy flow animations
+   - Frame should feel INNOVATIVE and state-of-the-art (like high-end sci-fi UI)
+   - Frame color: ${selectedHex} with cyan/white accents for depth
    - Make QR code LARGER (roughly 25-30% of wallpaper width)
    - Must be fully scannable (white background, clear borders)
    - Center it with 8% margin from bottom and sides
@@ -58,9 +71,13 @@ STYLE & ATMOSPHERE:
 - Sharp details, cinematic quality
 
 CRITICAL RULES:
+- DO NOT render any fake UI elements (status bars, battery icons, signal bars, etc.)
+- The wallpaper should be CLEAN at the top - just the background and text
 - Use the EXACT person from the portrait (don't change their body or clothes)
+- Position portrait HEAD at 30-40% from top to avoid notification overlap
 - Use the EXACT logo from the logo image (integrate it into the scene)
 - Keep QR code 100% scannable
+- Make each wallpaper UNIQUE with varied background patterns and QR frame design
 - NO WHITE BORDERS or frames around the image
 - Output: 9:16 vertical format, single integrated image with NO padding or margins`;
 
