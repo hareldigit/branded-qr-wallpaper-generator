@@ -33,9 +33,11 @@ async function generateWallpaper(params) {
 LAYOUT (Top to Bottom):
 1. TOP SAFE ZONE - Minimal empty space (just enough for phone status bar - about 5-8%)
 2. HEADER (Start close to top with minimal padding):
-   - Line 1: "${personalName}" in LARGE glowing ${selectedHex} futuristic font
-   - Line 2: "${eventName}" in LARGE white/light font (SAME SIZE as Line 1)
-   - IMPORTANT: If text is too long, reduce font size to fit within 85% of screen width
+   - Line 1: "${personalName}" in MEDIUM-LARGE glowing ${selectedHex} futuristic font
+   - Line 2: "${eventName}" in MEDIUM-LARGE white/light font (SAME SIZE as Line 1)
+   - CRITICAL: Text width must NOT exceed 70% of screen width.
+   - Maintain 15% SIDE PADDING on both left and right. Text must NOT touch edges.
+   - If text is long, wrap to new line or reduce size to fit STRICTLY within the safe width.
    - Very close spacing between the two lines (almost stacked)
 3. CENTRAL SUBJECT - Use the person from the portrait image EXACTLY AS THEY APPEAR (same clothes, same pose)
    - CRITICAL: Position the person's HEAD 30-40% down from the top (below where notifications appear)
@@ -49,6 +51,7 @@ LAYOUT (Top to Bottom):
    - Use DIFFERENT circuit board patterns, data flow directions, and holographic elements each time
    - Floating data streams and holographic UI elements in varied positions
    - Place the logo image as a holographic projection or glowing emblem in the scene
+     * CRITICAL: Ensure logo has 15% SIDE MARGINS (never touch screen edges)
    - Use volumetric lighting with ${selectedHex} as primary light source
    - Add random tech elements: hex grids, wireframes, or glowing particles
 5. BOTTOM - LARGE QR code with FUTURISTIC high-contrast frame:
@@ -62,7 +65,8 @@ LAYOUT (Top to Bottom):
    - Frame color: ${selectedHex} with cyan/white accents for depth
    - Make QR code LARGER (roughly 25-30% of wallpaper width)
    - Must be fully scannable (white background, clear borders)
-   - Center it with 8% margin from bottom and sides
+   - Center it with 12% SIDE MARGINS on left and right (CRITICAL: do not touch edges)
+   - Add 8% margin from the very bottom edge
 
 STYLE & ATMOSPHERE:
 - Cyberpunk/Tech aesthetic with depth and layers
@@ -71,6 +75,7 @@ STYLE & ATMOSPHERE:
 - Sharp details, cinematic quality
 
 CRITICAL RULES:
+- enforce 12-15% SIDE MARGINS for ALL critical content (Text, Logo, QR)
 - DO NOT render any fake UI elements (status bars, battery icons, signal bars, etc.)
 - The wallpaper should be CLEAN at the top - just the background and text
 - Use the EXACT person from the portrait (don't change their body or clothes)
