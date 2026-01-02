@@ -14,11 +14,29 @@ zip -r deploy.zip . \
 
 echo "⚠️  WARNING: This will OVERWRITE the .env file on the server!"
 read -p "🔐 To confirm, type 'OVERWRITE': " CONFIRMATION
+
+# Ensure remote directory exists
+echo "📁 creating remote directory..."
+ssh root@$SERVER_IP "mkdir -p $REMOTE_DIR"
+
 if [[ "$CONFIRMATION" == "OVERWRITE" ]]; then
     echo "🔐 Copying .env file securely..."
     scp .env root@$SERVER_IP:$REMOTE_DIR/.env
 else
     echo "⏭️  Skipping .env update."
+fi
+
+# Ask to upload assets
+read -p "🖼️  Update fixed assets (QR, Portrait, Style Reference)? Type 'ASSETS' to confirm: " ASSET_CONFIRM
+echo
+if [[ "$ASSET_CONFIRM" == "ASSETS" ]]; then
+    echo "🖼️  Uploading assets..."
+    # Copy only specific fixed files to avoid junk
+    scp storage/qr_fixed.* root@$SERVER_IP:$REMOTE_DIR/storage/ 2>/dev/null || echo "No qr_fixed found"
+    scp storage/portrait_fixed.* root@$SERVER_IP:$REMOTE_DIR/storage/ 2>/dev/null || echo "No portrait_fixed found"
+    scp storage/style_reference.* root@$SERVER_IP:$REMOTE_DIR/storage/ 2>/dev/null || echo "No style_reference found"
+else
+    echo "⏭️  Skipping assets update."
 fi
 
 echo "🚀 Uploading Project Files..."

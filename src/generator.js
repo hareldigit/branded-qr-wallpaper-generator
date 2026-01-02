@@ -75,7 +75,9 @@ STYLE & ATMOSPHERE:
 - Sharp details, cinematic quality
 
 CRITICAL RULES:
-- enforce 12-15% SIDE MARGINS for ALL critical content (Text, Logo, QR)
+- DO NOT render any dimension lines, arrows, percentage numbers (like "15%"), or padding indicators.
+- The margin instructions (12%, 15%, etc.) are for YOUR INTERNAL LAYOUT LOGIC ONLY.
+- The final image must be clean art, NO technical diagrams or measurements.
 - DO NOT render any fake UI elements (status bars, battery icons, signal bars, etc.)
 - The wallpaper should be CLEAN at the top - just the background and text
 - Use the EXACT person from the portrait (don't change their body or clothes)
