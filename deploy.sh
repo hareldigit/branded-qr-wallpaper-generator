@@ -12,7 +12,16 @@ zip -r deploy.zip . \
   -x "*.DS_Store" \
   -x "storage/*"
 
-echo "🚀 Uploading to Server..."
+echo "⚠️  WARNING: This will OVERWRITE the .env file on the server!"
+read -p "🔐 To confirm, type 'OVERWRITE': " CONFIRMATION
+if [[ "$CONFIRMATION" == "OVERWRITE" ]]; then
+    echo "🔐 Copying .env file securely..."
+    scp .env root@$SERVER_IP:$REMOTE_DIR/.env
+else
+    echo "⏭️  Skipping .env update."
+fi
+
+echo "🚀 Uploading Project Files..."
 scp deploy.zip root@$SERVER_IP:$REMOTE_DIR/
 
 echo "🛠️  Building and Deploying on Server..."
