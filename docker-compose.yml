@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  brand-lock-ai:
+    build: .
+    container_name: brand-lock-ai
+    env_file: .env
+    volumes:
+      - ./storage:/app/storage
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
