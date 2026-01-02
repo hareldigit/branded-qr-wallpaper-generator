@@ -6,9 +6,6 @@ const {
   extractColors,
   validateImage,
   convertToPNG,
-  saveFixedAsset,
-  loadFixedAsset,
-  assetExists,
   loadAssetByBasename,
   assetExistsByBasename,
   isValidURL

@@ -174,6 +174,5 @@ async function generateWallpaperWithRetry(params, maxRetries = 3) {
 }
 
 module.exports = {
-  generateWallpaper,
   generateWallpaperWithRetry
 };
