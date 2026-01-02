@@ -1,18 +1,16 @@
-# 🎨 Brand Lock AI
+# 🎨 Branded QR Wallpaper Generator
 
-AI-powered cyberpunk lock screen wallpaper generator for Telegram using Google Gemini AI.
+AI-powered branded lock screen wallpaper generator with integrated QR codes for Telegram, using Google Gemini's Nano Banana Pro.
 
 ## ✨ Features
 
 - 🤖 **Telegram Bot Interface**: Easy-to-use conversational flow
-- 🎨 **AI-Generated Wallpapers**: Powered by Google Gemini 2.0 Flash
+- 🎨 **AI-Generated Wallpapers**: Powered by Google Gemini's Nano Banana Pro (gemini-3-pro-image-preview)
+- 🖼️ **Portrait Integration**: Upload your photo to appear in the wallpaper
+- 🏷️ **Dual Text Display**: Personal name + Event name for perfect branding
 - 🌈 **Smart Color Extraction**: Automatic palette generation from your logo
-- 📱 QR Code Integration: Generate or upload QR codes for your wallpaper
-- 📱 **Image Processing Libraries**:
-* `node-vibrant` v4.0.3: Extract dominant color palettes from logo images
-* `qrcode` v1.5.4: Generate QR codes from URLs in real-time
-* `sharp` v0.34.5: Image buffer manipulation, validation, and format conversionly authorized access
-- 💾 **Persistent Storage**: Save logos and QR codes for future use
+- 📱 **QR Code Integration**: Generate or upload QR codes for your wallpaper
+- 💾 **Persistent Storage**: Save logos, portraits, and QR codes for future use
 - 🔒 **Secure**: User ID validation ensures only authorized access
 - 🐳 **Docker Ready**: Easy deployment with Docker Compose
 
@@ -30,7 +28,7 @@ AI-powered cyberpunk lock screen wallpaper generator for Telegram using Google G
 
 ```bash
 git clone <repository-url>
-cd brand-lock-ai
+cd branded-qr-wallpaper-generator
 ```
 
 ### 2. Install Dependencies
@@ -55,7 +53,8 @@ GEMINI_API_KEY=your_gemini_api_key_here
 ALLOWED_TELEGRAM_ID=your_telegram_user_id
 DEFAULT_USER_NAME=Your Name
 STORAGE_PATH=/app/storage
-GEMINI_MODEL=gemini-2.0-flash-exp
+# Recommended: gemini-3-pro-image-preview (Nano Banana Pro) for best quality
+GEMINI_MODEL=gemini-3-pro-image-preview
 ```
 
 ### 4. Run Locally
@@ -81,7 +80,7 @@ docker compose up -d --build
 View logs:
 
 ```bash
-docker logs -f brand-lock-ai
+docker logs -f branded-qr-wallpaper-bot
 ```
 
 Stop the bot:
@@ -110,8 +109,8 @@ docker compose down
 
     ```bash
     ssh root@your.server.ip.address
-    mkdir -p /root/brand-lock-ai
-    nano /root/brand-lock-ai/.env
+    mkdir -p /root/branded-qr-wallpaper-generator
+    nano /root/branded-qr-wallpaper-generator/.env
     # Paste your environment variables
     ```
 
@@ -131,47 +130,58 @@ docker compose down
 
 1.  **Start the bot**: Send `/start` to your bot on Telegram
 
-2.  **Choose your name**:
+2.  **Choose your personal name**:
     - Use default name or enter a custom one
 
-3.  **Upload your logo**:
+3.  **Enter event name**:
+    - Specify the event or occasion (e.g., "TechGym", "AI Summit 2025")
+
+4.  **Upload your logo**:
     - Upload a new logo or use a saved one
     - Option to save for future use
 
-4.  **Select accent color**:
+5.  **Select accent color**:
     - Bot extracts 5 dominant colors from your logo
     - Choose your preferred neon accent color
 
-5.  **Add QR code**:
+6.  **Upload your portrait** (optional):
+    - Upload your photo to appear in the wallpaper
+    - Use saved portrait or skip this step
+
+7.  **Add QR code**:
     - Generate from URL
     - Upload an image
     - Use a saved QR code
 
-6.  **Receive your wallpaper**:
-    - AI generates a cyberpunk-style 9:16 wallpaper
+8.  **Receive your wallpaper**:
+    - AI generates a cyberpunk-style 9:16 wallpaper with your branding
     - Download and set as your lock screen!
 
 ## 🎨 Wallpaper Style
 
-The bot generates **cyberpunk-themed lock screen wallpapers** with:
+The bot generates **professional cyberpunk-themed lock screen wallpapers** with:
 
-- ✨ Neon bioluminescent effects
-- 🌟 Volumetric lighting and atmospheric depth
-- 🔮 Holographic 3D text
-- 💎 Glass morphism effects on logo
-- 📱 High-contrast QR code frame
-- 📐 9:16 aspect ratio (1080x1920px)
-- ⏰ Safe zone for status bar and clock
+- 👤 **Your Portrait**: Integrated as the central subject with cyberpunk styling
+- 🏷️ **Dual Branding**: Personal name (large) + Event name (large) in glowing neon
+- ✨ Neon bioluminescent effects with volumetric lighting
+- 🌟 Atmospheric depth and holographic elements
+- 🔮 Integrated logo as holographic projection
+- 💎 High-contrast QR code frame (larger, more scannable)
+- 📐 9:16 aspect ratio optimized for mobile lock screens
+- ⏰ Minimal top padding for status bar
 
 ## 🔧 Project Structure
 
 ```
-brand-lock-ai/
+branded-qr-wallpaper-generator/
 ├── src/
 │   ├── bot.js          # Main bot logic & state machine
-│   ├── generator.js    # Gemini AI integration
+│   ├── generator.js    # Gemini API integration (Nano Banana Pro)
 │   └── utils.js        # Image processing utilities
 ├── storage/            # Persistent storage (bind mount)
+│   ├── logo_fixed.*    # Saved logo (optional)
+│   ├── portrait_fixed.*# Saved portrait (optional)
+│   └── qr_fixed.*      # Saved QR code (optional)
 ├── .env                # Environment configuration
 ├── .env.example        # Environment template
 ├── package.json        # Dependencies
@@ -193,7 +203,7 @@ brand-lock-ai/
 ### Bot doesn't respond
 
 - Check if the bot is running: `docker ps`
-- View logs: `docker logs -f brand-lock-ai`
+- View logs: `docker logs -f branded-qr-wallpaper-bot`
 - Verify your Telegram user ID matches `ALLOWED_TELEGRAM_ID`
 
 ### Image processing errors
@@ -220,16 +230,16 @@ View real-time logs:
 
 ```bash
 # Local
-docker logs -f brand-lock-ai
+docker logs -f branded-qr-wallpaper-bot
 
 # Remote
-ssh root@your.server.ip 'docker logs -f brand-lock-ai'
+ssh root@your.server.ip 'docker logs -f branded-qr-wallpaper-bot'
 ```
 
 Check container status:
 
 ```bash
-docker ps | grep brand-lock-ai
+docker ps | grep branded-qr-wallpaper
 ```
 
 ## 🔄 Updates
@@ -251,7 +261,7 @@ The script handles everything automatically!
 | `ALLOWED_TELEGRAM_ID` | ✅ Yes | Your Telegram user ID (security) |
 | `DEFAULT_USER_NAME` | ✅ Yes | Default name for wallpapers |
 | `STORAGE_PATH` | ✅ Yes | Storage path (use `/app/storage` in Docker) |
-| `GEMINI_MODEL` | ⚠️ Optional | Gemini model (default: `gemini-2.0-flash-exp`) |
+| `GEMINI_MODEL` | ⚠️ Optional | Gemini model - Recommended: `gemini-3-pro-image-preview` (Nano Banana Pro) for best quality |
 
 ## 🤝 Contributing
 

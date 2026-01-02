@@ -289,7 +289,7 @@ bot.command('start', async (ctx) => {
   }
 
   await ctx.reply(
-    `Welcome to Brand Lock AI! 🎨${status}\nChoose your name:`,
+    `Welcome to Branded QR Wallpaper Generator! 🎨${status}\nChoose your name:`,
     Markup.inlineKeyboard([
       [Markup.button.callback(`⚡ Use Default Name (${process.env.DEFAULT_USER_NAME})`, 'name_default')],
       [Markup.button.callback('✏️ Enter Custom Name', 'name_custom')]

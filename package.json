@@ -1,7 +1,7 @@
 {
-  "name": "brand-lock-ai",
+  "name": "branded-qr-wallpaper-generator",
   "version": "1.0.0",
-  "description": "AI-powered cyberpunk lock screen wallpaper generator for Telegram",
+  "description": "AI-powered branded wallpaper generator with QR code integration for Telegram",
   "main": "src/bot.js",
   "scripts": {
     "start": "node src/bot.js",

@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  brand-lock-ai:
+  bot:
     build: .
-    container_name: brand-lock-ai
+    container_name: branded-qr-wallpaper-bot
     env_file: .env
     volumes:
       - ./storage:/app/storage

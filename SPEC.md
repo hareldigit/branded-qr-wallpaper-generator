@@ -1,4 +1,4 @@
-# 🚀 Technical Specification: brand-lock-ai (Project "Anti-Gravity")
+# 🚀 Technical Specification: branded-qr-wallpaper-generator (Project "Anti-Gravity")
 
 ## 1. System Architecture & Stack
 
@@ -24,7 +24,7 @@
 ## 2. File Structure
 
 ```
-brand-lock-ai/
+branded-qr-wallpaper-generator/
 ├── src/
 │   ├── bot.js            # Entry point, Telegraf initialization, State machine, Middleware
 │   ├── generator.js      # Gemini API integration, Prompt engineering, Image generation
@@ -119,11 +119,14 @@ The bot uses a **session-based state machine** to track user progress through th
 
 ```javascript
 ctx.session = {
-  state: 'AWAITING_NAME' | 'AWAITING_LOGO' | 'AWAITING_COLOR' | 'AWAITING_QR' | 'GENERATING',
+  state: 'AWAITING_NAME' | 'AWAITING_EVENT' | 'AWAITING_LOGO' | 'AWAITING_COLOR' | 'AWAITING_PORTRAIT' | 'AWAITING_QR' | 'GENERATING',
   data: {
-    eventName: null,        // String: User's name or custom event
+    personalName: null,     // String: User's personal name
+    eventName: null,        // String: Event name
     logoBuffer: null,       // Buffer: Logo image (from file or upload)
     logoSource: null,       // 'fixed' | 'onetime'
+    portraitBuffer: null,   // Buffer: Portrait image (optional)
+    portraitSource: null,   // 'fixed' | 'onetime' | 'skipped'
     selectedHex: null,      // String: Selected HEX color (e.g., '#FF6B35')
     qrBuffer: null,         // Buffer: QR code image
     qrSource: null,         // 'fixed' | 'onetime' | 'generated'
@@ -139,9 +142,11 @@ ctx.session = {
 ```
 /start
   ↓
-Check for saved assets (logo_fixed.png, qr_fixed.png)
+Check for saved assets (logo_fixed.*, portrait_fixed.*, qr_fixed.*)
   ↓
-[AWAITING_NAME] → Name Selection
+[AWAITING_NAME] → Personal Name Selection
+  ↓
+[AWAITING_EVENT] → Event Name Input
   ↓
 [AWAITING_LOGO] → Logo Selection/Upload
   ↓
@@ -149,9 +154,11 @@ Extract colors with node-vibrant
   ↓
 [AWAITING_COLOR] → Color Palette Selection
   ↓
+[AWAITING_PORTRAIT] → Portrait Selection/Upload/Skip
+  ↓
 [AWAITING_QR] → QR Selection/Upload/Generation
   ↓
-[GENERATING] → Call Gemini API
+[GENERATING] → Call Gemini Nano Banana Pro API
   ↓
 Send wallpaper to user
   ↓
@@ -166,8 +173,8 @@ Reset session
 
 **Actions**:
 1. Initialize session
-2. Check if `storage/logo_fixed.png` and `storage/qr_fixed.png` exist
-3. Display welcome message with name selection
+2. Check if `storage/logo_fixed.*`, `storage/portrait_fixed.*`, and `storage/qr_fixed.*` exist
+3. Display welcome message with personal name selection
 
 **Inline Keyboard**:
 ```
@@ -181,16 +188,34 @@ Reset session
 
 **Message**:
 ```
-Welcome to Brand Lock AI! 🎨
+Welcome to Branded QR Wallpaper Generator! 🎨
 
 Let's create your personalized cyberpunk wallpaper.
 
-Choose your name:
+What's your name (for display)?
 ```
 
 **User Actions**:
-- Click "⚡ Use Default Name" → Set `ctx.session.data.eventName = process.env.DEFAULT_USER_NAME` → Move to AWAITING_LOGO
+- Click "⚡ Use Default Name" → Set `ctx.session.data.personalName = process.env.DEFAULT_USER_NAME` → Move to AWAITING_EVENT
 - Click "✏️ Enter Custom Name" → Wait for text input
+- Send text message → Set `ctx.session.data.personalName = ctx.message.text` → Move to AWAITING_EVENT
+
+---
+
+#### State 1.5: AWAITING_EVENT
+
+**Trigger**: Personal name selected
+
+**Actions**:
+1. Prompt user for event name
+
+**Message**:
+```
+🎉 What's the event name?
+(e.g., TechGym, AI Summit 2025)
+```
+
+**User Actions**:
 - Send text message → Set `ctx.session.data.eventName = ctx.message.text` → Move to AWAITING_LOGO
 
 ---
@@ -306,8 +331,61 @@ Select your neon accent color:
 ```
 
 **User Actions**:
-- Click any color button → Set `ctx.session.data.selectedHex = clickedColor` → Move to AWAITING_QR
+- Click any color button → Set `ctx.session.data.selectedHex = clickedColor` → Move to AWAITING_PORTRAIT
 - Click "🌈 Open Vibrant Palette" → Send link to color picker website (optional feature)
+
+---
+
+#### State 3.5: AWAITING_PORTRAIT
+
+**Trigger**: Color selected
+
+**Actions**:
+1. Check if `storage/portrait_fixed.*` exists
+2. Display portrait selection options
+
+**Scenario A: portrait_fixed.* EXISTS**
+
+**Inline Keyboard**:
+```
+┌─────────────────────────────────┐
+│ 💾 Use Saved Portrait           │
+├─────────────────────────────────┤
+│ 📤 Upload One-Time Portrait     │
+├─────────────────────────────────┤
+│ ⏭️ Skip Portrait                │
+└─────────────────────────────────┘
+```
+
+**Message**:
+```
+Great! Now let's add your portrait. 🖼️
+
+You have a saved portrait. What would you like to do?
+```
+
+**Scenario B: portrait_fixed.* DOES NOT EXIST**
+
+**Inline Keyboard**:
+```
+┌─────────────────────────────────┐
+│ 📤 Upload Portrait              │
+├─────────────────────────────────┤
+│ ⏭️ Skip Portrait                │
+└─────────────────────────────────┘
+```
+
+**Message**:
+```
+Would you like to add your portrait to the wallpaper? 🖼️
+
+You can upload your photo or skip this step.
+```
+
+**User Actions**:
+- Click "💾 Use Saved Portrait" → Load `storage/portrait_fixed.*` → Set `portraitSource = 'fixed'` → Move to AWAITING_QR
+- Click "📤 Upload One-Time Portrait" → Wait for photo → Store in memory → Set `portraitSource = 'onetime'` → Move to AWAITING_QR
+- Click "⏭️ Skip Portrait" → Set `portraitSource = 'skipped'` → Move to AWAITING_QR
 
 ---
 
@@ -392,9 +470,11 @@ This may take 10-30 seconds. Please wait.
 **Parameters Sent to Gemini**:
 ```javascript
 {
+  personalName: ctx.session.data.personalName,
   eventName: ctx.session.data.eventName,
   selectedHex: ctx.session.data.selectedHex,
   logoBuffer: ctx.session.data.logoBuffer,
+  portraitBuffer: ctx.session.data.portraitBuffer, // null if skipped
   qrBuffer: ctx.session.data.qrBuffer
 }
 ```
@@ -421,108 +501,81 @@ Please try again with /start
 
 This is the **exact prompt** sent to Gemini API for image generation.
 
-### Prompt Template
+### Prompt Template (Nano Banana Pro)
 
 ```javascript
-const prompt = `Create a high-resolution 9:16 vertical lock screen wallpaper with the following specifications:
+const prompt = `Create a stunning 9:16 vertical cyberpunk lock screen wallpaper with these exact specifications:
 
-STYLE & AESTHETIC:
-- Cyberpunk Identity / Tech-Premium visual language
-- Volumetric lighting with atmospheric depth
-- Neon bioluminescent effects
-- Futuristic holographic elements
-- Premium state-of-the-art quality
+LAYOUT (Top to Bottom):
+1. TOP SAFE ZONE - Minimal empty space (just enough for phone status bar - about 5-8%)
+2. HEADER (Start close to top with minimal padding):
+   - Line 1: "${params.personalName}" in LARGE glowing ${params.selectedHex} futuristic font
+   - Line 2: "${params.eventName}" in LARGE white/light font (SAME SIZE as Line 1)
+   - Very close spacing between the two lines (almost stacked)
+3. CENTRAL SUBJECT - Use the person from the portrait image EXACTLY AS THEY APPEAR (same clothes, same pose)
+   - Keep their natural appearance and clothing
+   - Add cyberpunk atmosphere AROUND them (not changing them)
+   - Illuminate them with ${params.selectedHex} neon rim-lighting
+   - Add a glowing circular halo or frame around their head/shoulders
+4. BACKGROUND - Complex tech environment:
+   - Circuit board traces and digital patterns
+   - Floating data streams and holographic UI elements
+   - Place the logo image as a holographic projection or glowing emblem in the scene
+   - Use volumetric lighting with ${params.selectedHex} as primary light source
+5. BOTTOM - LARGE QR code with high-contrast neon frame in ${params.selectedHex}
+   - Make QR code LARGER (roughly 25-30% of wallpaper width)
+   - Must be fully scannable (white background, clear borders)
+   - Center it with 8% margin from bottom and sides
 
-SAFE ZONE (CRITICAL):
-- Leave the top 15% of the canvas completely empty
-- This area is reserved for iOS/Android status bar and clock
-- No visual elements should extend into this zone
+STYLE & ATMOSPHERE:
+- Cyberpunk/Tech aesthetic with depth and layers
+- Professional lighting: ${params.selectedHex} key light, cyan/blue fill light
+- Atmospheric haze and glow effects
+- Sharp details, cinematic quality
 
-COLOR TREATMENT:
-- Primary accent color: ${params.selectedHex}
-- Treat this color as a NEON/BIOLUMINESCENT light source
-- Apply rim-lighting effects around all elements
-- Use volumetric glow and atmospheric haze
-- Create depth with gradient falloff
-- NO FLAT COLORS - everything must have luminosity and depth
-
-LAYOUT ELEMENTS (9:16 vertical format):
-
-1. UPPER-MIDDLE SECTION (below safe zone):
-   - Text: "${params.eventName}"
-   - Font: 3D futuristic typeface with holographic effect
-   - Treatment: Glowing edges, subtle transparency, depth shadows
-   - Size: Large and prominent but not overwhelming
-
-2. CENTER SECTION:
-   - Element: Branded logo (provided as image)
-   - Effect: Floating glass morphism with subtle reflections
-   - Treatment: Semi-transparent with frosted glass effect
-   - Lighting: Rim-lit from behind with ${params.selectedHex} glow
-   - Shadow: Soft volumetric shadow beneath
-
-3. BOTTOM SECTION:
-   - Element: QR code (provided as image)
-   - Frame: High-contrast illuminated border
-   - Treatment: Neon frame in ${params.selectedHex} color
-   - Background: Dark contrasting panel for scannability
-   - CRITICAL: QR code must remain fully scannable - maintain high contrast
-
-TECHNICAL REQUIREMENTS:
-- Resolution: Minimum 1080x1920 pixels (9:16 aspect ratio)
-- Format: PNG with transparency support where applicable
-- Quality: Maximum detail and sharpness
-- Text legibility: All text must be clearly readable
-- QR scannability: QR code must be 100% scannable with standard QR readers
-
-COMPOSITION RULES:
-- Maintain visual hierarchy: Name → Logo → QR
-- Use rule of thirds for element placement
-- Create depth with layered elements
-- Apply atmospheric perspective (distant elements more hazy)
-- Balance negative space for breathing room
-
-LIGHTING SETUP:
-- Key light: ${params.selectedHex} neon source from top-right
-- Fill light: Subtle cyan/blue ambient from bottom-left
-- Rim light: Accent highlights on all major elements
-- Atmospheric fog: Subtle volumetric haze throughout
-
-DO NOT INCLUDE:
-- Any device frames (phones, tablets, etc.)
-- Any UI elements beyond the specified content
-- Any watermarks or signatures
-- Any text other than "${params.eventName}"
-
-The final result should look like a premium, state-of-the-art cyberpunk lock screen that could be featured in a high-end tech showcase.`;
+CRITICAL RULES:
+- Use the EXACT person from the portrait (don't change their body or clothes)
+- Use the EXACT logo from the logo image (integrate it into the scene)
+- Keep QR code 100% scannable
+- NO WHITE BORDERS or frames around the image
+- Output: 9:16 vertical format, single integrated image with NO padding or margins`;
 ```
 
 ### Image Attachments
 
-The prompt is sent with **TWO image attachments**:
+The prompt is sent with **THREE image attachments** (portrait is optional):
 1. **Logo Image**: `params.logoBuffer` (converted to base64)
 2. **QR Code Image**: `params.qrBuffer` (converted to base64)
+3. **Portrait Image**: `params.portraitBuffer` (converted to base64, null if skipped)
 
-### Gemini API Call Structure
+### Gemini API Call Structure (Nano Banana Pro)
 
 ```javascript
-const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
+const model = genAI.getGenerativeModel({ 
+  model: process.env.GEMINI_MODEL || 'gemini-3-pro-image-preview' 
+});
 
-const result = await model.generateContent([
-  prompt,
-  {
-    inlineData: {
-      data: params.logoBuffer.toString('base64'),
-      mimeType: 'image/png'
-    }
-  },
-  {
-    inlineData: {
-      data: params.qrBuffer.toString('base64'),
-      mimeType: 'image/png'
-    }
+const parts = [
+  { text: "IMAGE 1 (BRAND LOGO):" },
+  { inlineData: { data: bufferToBase64(logoBuffer), mimeType: 'image/png' } },
+  { text: "\nIMAGE 2 (QR CODE):" },
+  { inlineData: { data: bufferToBase64(qrBuffer), mimeType: 'image/png' } },
+];
+
+if (portraitBuffer) {
+  parts.push({ text: "\nIMAGE 3 (USER PORTRAIT - CENTRAL SUBJECT):" });
+  parts.push({ inlineData: { data: bufferToBase64(portraitBuffer), mimeType: 'image/png' } });
+}
+
+parts.push({ text: "\n\n" + prompt });
+
+const result = await model.generateContent({
+  contents: [{ role: 'user', parts }],
+  generationConfig: {
+    responseModalities: ["TEXT", "IMAGE"],
+    temperature: 0.6
   }
-]);
+});
 ```
 
 ---
@@ -564,9 +617,9 @@ CMD ["node", "src/bot.js"]
 version: '3.8'
 
 services:
-  brand-lock-ai:
+  bot:
     build: .
-    container_name: brand-lock-ai
+    container_name: branded-qr-wallpaper-bot
     env_file: .env
     volumes:
       - ./storage:/app/storage
@@ -582,8 +635,9 @@ services:
 
 ```
 storage/
-├── logo_fixed.png    # Persistent saved logo (optional)
-└── qr_fixed.png      # Persistent saved QR code (optional)
+├── logo_fixed.*       # Persistent saved logo (optional, any image format)
+├── portrait_fixed.*   # Persistent saved portrait (optional, any image format)
+└── qr_fixed.*         # Persistent saved QR code (optional, any image format)
 ```
 
 **Persistence Rules**:
@@ -601,7 +655,7 @@ storage/
 
 # Configuration
 SERVER_IP="1.2.3.4"  # ⚠️ MUST BE REPLACED WITH ACTUAL SERVER IP
-REMOTE_DIR="/root/brand-lock-ai"
+REMOTE_DIR="/root/branded-qr-wallpaper-generator"
 
 echo "📦 Zipping files..."
 zip -r deploy.zip . \
@@ -616,7 +670,7 @@ scp deploy.zip root@$SERVER_IP:$REMOTE_DIR/
 
 echo "🛠️  Building and Deploying on Server..."
 ssh root@$SERVER_IP << 'ENDSSH'
-cd /root/brand-lock-ai
+cd /root/branded-qr-wallpaper-generator
 unzip -o deploy.zip
 rm deploy.zip
 docker compose down
@@ -628,7 +682,7 @@ echo "🧹 Cleaning up local zip..."
 rm deploy.zip
 
 echo "✅ Done! Bot updated successfully."
-echo "📊 Check logs with: ssh root@$SERVER_IP 'docker logs -f brand-lock-ai'"
+echo "📊 Check logs with: ssh root@$SERVER_IP 'docker logs -f branded-qr-wallpaper-bot'"
 ```
 
 ### Deployment Checklist
@@ -710,9 +764,9 @@ ctx.reply('ℹ️ Info message');
 
 ```json
 {
-  "name": "brand-lock-ai",
+  "name": "branded-qr-wallpaper-generator",
   "version": "1.0.0",
-  "description": "AI-powered cyberpunk lock screen wallpaper generator",
+  "description": "AI-powered branded wallpaper generator with QR code integration",
   "main": "src/bot.js",
   "scripts": {
     "start": "node src/bot.js",
