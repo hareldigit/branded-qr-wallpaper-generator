@@ -47,16 +47,16 @@ branded-qr-wallpaper-generator/
 
 ```env
 # Telegram Bot Configuration
-TELEGRAM_TOKEN=1234567890:ABCdefGHIjklMNOpqrsTUVwxyz123456789
+TELEGRAM_TOKEN=your_token_here
 
 # Google Gemini API
-GEMINI_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+GEMINI_API_KEY=your_gemini_api_key_here
 
 # Security - CRITICAL: Only this user ID can interact with the bot
 ALLOWED_TELEGRAM_ID=123456789
 
 # Default Configuration
-DEFAULT_USER_NAME=Harel Dagan
+DEFAULT_USER_NAME=Harel
 
 # Storage Path (inside Docker container)
 STORAGE_PATH=/app/storage
